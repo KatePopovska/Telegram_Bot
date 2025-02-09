@@ -53,7 +53,8 @@ namespace TelegramBot.Handlers
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Here are the available commands...");
                     break;
                 default:
-                    await _botClient.SendTextMessageAsync(message.Chat.Id, "Unknown command.");
+                    
+                   // await _genreHandler.HandleGenreSelectionAsync(callbackQuery);
                     break;
             }
         }

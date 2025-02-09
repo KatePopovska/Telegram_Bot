@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 appsettings.json
+/TelegramBot/causal-setting-450114-v7-a4ae77920bdd.json
