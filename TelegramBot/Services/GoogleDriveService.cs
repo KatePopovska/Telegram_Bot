@@ -1,21 +1,21 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace TelegramBot.Services
 {
     public class GoogleDriveService
     {
         private readonly DriveService _driveService;
-        private readonly Dictionary<string, string> _folderCache = new Dictionary<string, string>();
-        private readonly Dictionary<string, MemoryStream> _fileCache = new Dictionary<string, MemoryStream>();
+        private readonly Dictionary<string, string> _folderCache = new();
 
         public GoogleDriveService()
         {
@@ -32,33 +32,26 @@ namespace TelegramBot.Services
             });
         }
 
-        public async Task<List<(string Name, MemoryStream Stream)>> GetMp3FilesAsync(string genre)
+        public async Task<FileList> GetMp3FilesAsync(string genre)
         {
             string folderId = await GetFolderIdByGenre(genre);
             var request = _driveService.Files.List();
             request.Q = $"'{folderId}' in parents and mimeType='audio/mpeg'";
             request.Fields = "files(id, name)";
             var response = await request.ExecuteAsync();
-
-            var stopwatch = Stopwatch.StartNew();
-
-            var files = new List<(string Name, MemoryStream Stream)>();
-
-            foreach (var file in response.Files)
-            {
-                var stream = new MemoryStream();
-                var getRequest = _driveService.Files.Get(file.Id);
-                await getRequest.DownloadAsync(stream); //VERY LONG
-                stream.Position = 0; 
-                files.Add((file.Name, stream));
-            }
-
-            stopwatch.Stop();
-            Console.WriteLine($"Execution time: {stopwatch.ElapsedMilliseconds} ms");
-
-            return files;
+            return response;
         }
 
+        public async Task<(string Name, MemoryStream Stream)> DownloadFilesAsync(Google.Apis.Drive.v3.Data.File file)
+        {
+                var stream = new MemoryStream();
+                var getRequest = _driveService.Files.Get(file.Id);
+                await getRequest.DownloadAsync(stream);
+                stream.Position = 0;
+
+
+            return (file.Name, stream);
+        }
 
         private async Task<string> GetFolderIdByGenre(string genre)
         {

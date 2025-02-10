@@ -16,6 +16,7 @@ namespace TelegramBot.Handlers
         private readonly ITelegramBotClient _botClient;
         private readonly GenreHandler _genreHandler;
         private readonly GoogleDriveService _googleDriveService;
+        private Dictionary<string, string> _telegramFileCache = new Dictionary<string, string>();
 
         public CallbackQueryHandler(ITelegramBotClient botClient)
         {
@@ -54,18 +55,25 @@ namespace TelegramBot.Handlers
             {
                 string genre = callbackQuery.Data.Replace("genre_", "");
                 await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
-                var stopwatch = Stopwatch.StartNew();
-                var files = await _googleDriveService.GetMp3FilesAsync(genre);
-                stopwatch.Stop();
-                Console.WriteLine($"Execution time: {stopwatch.ElapsedMilliseconds} ms");
-                foreach (var file in files)
-                {
-                    await _botClient.SendAudioAsync(
-                                    chat.Id,
-                                    new InputFileStream(file.Stream, file.Name));
 
+                var files = await _googleDriveService.GetMp3FilesAsync(genre);
+
+                foreach (var file in files.Files)
+                {
+                    if (_telegramFileCache.ContainsKey(file.Name))
+                    {
+
+                        string fileId = _telegramFileCache[file.Name];
+                        await _botClient.SendAudioAsync(chat.Id, audio:fileId);
+                    }
+                    else
+                    {
+                        var stream = await _googleDriveService.DownloadFilesAsync(file);
+                        var message = await _botClient.SendAudioAsync(chat.Id, new InputFileStream(stream.Stream, stream.Name));
+                        _telegramFileCache[file.Name] = message.Audio.FileId;
+                    }
                 }
-               
+
 
             }
 
