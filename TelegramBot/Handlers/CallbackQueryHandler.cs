@@ -56,6 +56,8 @@ namespace TelegramBot.Handlers
                 string genre = callbackQuery.Data.Replace("genre_", "");
                 await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
 
+                var loadingMessage = await _botClient.SendTextMessageAsync(chat.Id, "🔄 Загрузка аудиофайлов...");
+
                 var files = await _googleDriveService.GetMp3FilesAsync(genre);
 
                 foreach (var file in files.Files)
@@ -74,11 +76,9 @@ namespace TelegramBot.Handlers
                     }
                 }
 
-
+                await _botClient.DeleteMessageAsync(chat.Id, loadingMessage.MessageId);
             }
 
-
-            await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "You clicked a button!");
         }       
 
     }
