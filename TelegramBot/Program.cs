@@ -15,6 +15,7 @@ string botToken = builder.Configuration["BotSettings:TelegramToken"] ?? throw ne
 
 
 var services = new ServiceCollection();
+services.AddLogging();
 services.AddSingleton<ITelegramBotClient>(sp => new TelegramBotClient(botToken));
 services.AddSingleton<BotService>(sp => new BotService(botToken));
 services.AddSingleton<MessageHandler>();

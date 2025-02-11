@@ -25,9 +25,11 @@ namespace TelegramBot.Handlers
                 { "Pop", "genre_Pop" },
                 { "Rock", "genre_Rock" },
                 { "Hip-Hop/Rap", "genre_HipHop"},
-                {"Electronic (EDM)", "genre_EDM" },
-                { "Liric", "genre_Liric" },
-                { "Reggae", "genre_Reggae"}
+               // {"Electronic (EDM)", "genre_EDM" },
+                { "Lyric", "genre_Liric" },
+                { "Reggae", "genre_Reggae"},
+                {"Trap", "genre_Trap" },
+                {"Post-Punk", "genre_PostPunk" }
             };
 
             var buttons = new List<InlineKeyboardButton[]>();

@@ -54,7 +54,6 @@ namespace TelegramBot.Handlers
                     break;
                 default:
                     
-                   // await _genreHandler.HandleGenreSelectionAsync(callbackQuery);
                     break;
             }
         }
